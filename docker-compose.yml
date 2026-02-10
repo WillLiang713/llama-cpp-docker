@@ -6,7 +6,7 @@ services:
     volumes:
       - ./models:/models
     environment:
-      LLAMA_ARG_MODEL: /models/Qwen3-Coder-Next-Q4_K_M/Qwen3-Coder-Next-Q4_K_M-00001-of-00004.gguf
+      LLAMA_ARG_MODEL: /models/Qwen3-Coder-Next-Q4_K_M/Q4_K_M/Qwen3-Coder-Next-Q4_K_M-00001-of-00004.gguf
       LLAMA_ARG_CTX_SIZE: 262144
       LLAMA_ARG_N_PARALLEL: 1
       LLAMA_ARG_N_GPU_LAYERS: 42
