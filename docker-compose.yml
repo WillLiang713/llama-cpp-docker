@@ -1,6 +1,7 @@
 services:
-  llama-server:
+  Qwen3-Coder-Next-Q4_K_M:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    container_name: Qwen3-Coder-Next-Q4_K_M
     ports:
       - "8787:8787"
     volumes:
