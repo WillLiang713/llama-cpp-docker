@@ -53,7 +53,7 @@ def download_model(model_id, quant, local_dir, max_retries):
         print("  pip install modelscope setuptools")
         sys.exit(1)
 
-    include_pattern = f"{quant}/*"
+    include_pattern = f"*{quant}*"
     print(f"模型: {model_id}")
     print(f"量化: {quant}")
     print(f"匹配: {include_pattern}")
@@ -91,14 +91,15 @@ def verify_files(local_dir, quant):
     print("文件校验")
     print("=" * 50)
 
-    quant_dir = Path(local_dir) / quant
-    if not quant_dir.exists():
-        print(f"错误: 目录不存在 {quant_dir}")
+    base = Path(local_dir)
+    if not base.exists():
+        print(f"错误: 目录不存在 {base}")
         return False
 
-    gguf_files = sorted(quant_dir.glob("*.gguf"))
+    # 递归搜索所有包含量化类型的 .gguf 文件
+    gguf_files = sorted(f for f in base.rglob("*.gguf") if quant in f.name)
     if not gguf_files:
-        print(f"错误: 未找到 .gguf 文件")
+        print(f"错误: 未找到包含 '{quant}' 的 .gguf 文件")
         return False
 
     print(f"找到 {len(gguf_files)} 个 .gguf 文件:\n")
@@ -133,6 +134,12 @@ def verify_files(local_dir, quant):
         return False
 
     print("\n校验结果: 全部通过")
+
+    # 打印 docker-compose 可用的模型路径
+    first_file = gguf_files[0]
+    rel_path = first_file.relative_to(Path(local_dir).parent)
+    print(f"\ndocker-compose 模型路径:")
+    print(f"  LLAMA_ARG_MODEL: /models/{rel_path.as_posix()}")
     return True
 
 
