@@ -1,27 +1,26 @@
 services:
-  Qwen3-Coder-Next-Q4_K_M:
+  GLM-4.7-Flash-UD-Q4_K_XL:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
-    container_name: Qwen3-Coder-Next-Q4_K_M
+    container_name: GLM-4.7-Flash-UD-Q4_K_XL
     ports:
-      - "8787:8787"
+      - "8788:8788"
     volumes:
       - ./models:/models
     environment:
-      LLAMA_ARG_MODEL: /models/Qwen3-Coder-Next-Q4_K_M/Q4_K_M/Qwen3-Coder-Next-Q4_K_M-00001-of-00004.gguf
+      LLAMA_ARG_MODEL: /models/unsloth/GLM-4.7-Flash-UD-Q4_K_XL/GLM-4.7-Flash-UD-Q4_K_XL.gguf
       LLAMA_ARG_N_PARALLEL: 1
       LLAMA_ARG_FLASH_ATTN: 1
       LLAMA_ARG_JINJA: 1
-      LLAMA_ARG_SEED: 3407
       LLAMA_ARG_TEMP: 1.0
       LLAMA_ARG_TOP_P: 0.95
-      LLAMA_ARG_TOP_K: 40
       LLAMA_ARG_MIN_P: 0.01
+      LLAMA_ARG_REPEAT_PENALTY: 1.0
       LLAMA_ARG_HOST: 0.0.0.0
-      LLAMA_ARG_PORT: 8787
+      LLAMA_ARG_PORT: 8788
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ["0", "1"]
+              device_ids: ["0"]
               capabilities: [gpu]
