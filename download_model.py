@@ -68,7 +68,6 @@ def download_model(model_id, quant, local_dir, max_retries):
                 model_id=model_id,
                 allow_patterns=[include_pattern],
                 local_dir=local_dir,
-                resume_download=True,
             )
             print("\n下载完成!")
             return True
