@@ -16,6 +16,7 @@ services:
       LLAMA_ARG_TOP_P: 0.95
       LLAMA_ARG_TOP_K: 40
       LLAMA_ARG_MIN_P: 0.01
+      LLAMA_ARG_CTX_SIZE: 262144
       LLAMA_ARG_HOST: 0.0.0.0
       LLAMA_ARG_PORT: 8787
     deploy:
