@@ -7,9 +7,9 @@ services:
     volumes:
       - ./models:/models
     environment:
-      LLAMA_ARG_MODEL: /models/unsloth/Qwen3.5-35B-A3B-GGUF/Q4_K_XL/Qwen3.5-35B-A3B-UD-Q4_K_XL.gguf
-      LLAMA_ARG_N_GPU_LAYERS: 33
-      LLAMA_ARG_N_PARALLEL: 1
+      LLAMA_ARG_MODEL: /models/unsloth/Qwen3.5-35B-A3B-GGUF/Q8_K_XL/Qwen3.5-35B-A3B-UD-Q8_K_XL.gguf
+      LLAMA_ARG_N_GPU_LAYERS: 99
+      LLAMA_ARG_N_PARALLEL: 4
       LLAMA_ARG_FLASH_ATTN: 1
       LLAMA_ARG_JINJA: 1
       LLAMA_ARG_SEED: 3407
@@ -18,7 +18,9 @@ services:
       LLAMA_ARG_TOP_K: 20
       LLAMA_ARG_MIN_P: 0.0
       LLAMA_ARG_PRESENCE_PENALTY: 1.5
-      LLAMA_ARG_CTX_SIZE: 16384
+      LLAMA_ARG_CTX_SIZE: 262144
+      LLAMA_ARG_CACHE_TYPE_K: q8_0
+      LLAMA_ARG_CACHE_TYPE_V: q8_0
       LLAMA_ARG_HOST: 0.0.0.0
       LLAMA_ARG_PORT: 8788
     deploy:
@@ -26,5 +28,5 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ["0"]
+              count: all
               capabilities: [gpu]
