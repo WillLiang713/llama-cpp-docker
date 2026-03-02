@@ -7,7 +7,8 @@ services:
     volumes:
       - ./models:/models
     environment:
-      LLAMA_ARG_MODEL: /models/unsloth/Qwen3.5-35B-A3B-GGUF/Q8_K_XL/Qwen3.5-35B-A3B-UD-Q8_K_XL.gguf
+      LLAMA_ARG_MODEL: /models/Qwen3.5-35B-A3B-GGUF/Q8_K_XL/Qwen3.5-35B-A3B-UD-Q8_K_XL.gguf
+      LLAMA_ARG_MMPROJ: /models/Qwen3.5-35B-A3B-GGUF/mmproj-BF16.gguf
       LLAMA_ARG_N_GPU_LAYERS: 99
       LLAMA_ARG_N_PARALLEL: 4
       LLAMA_ARG_FLASH_ATTN: 1
