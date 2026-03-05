@@ -14,6 +14,7 @@ services:
       LLAMA_ARG_N_PARALLEL: 4
       LLAMA_ARG_FLASH_ATTN: 1
       LLAMA_ARG_JINJA: 1
+      # LLAMA_CHAT_TEMPLATE_KWARGS: '{"enable_thinking":false}' # 关闭思考动画
       LLAMA_ARG_SEED: 3407
       LLAMA_ARG_TEMP: 1.0
       LLAMA_ARG_TOP_P: 0.95
