@@ -1,35 +1,57 @@
 services:
   Qwen3.5-35B-A3B:
+    # 使用支持 CUDA 的 llama.cpp 服务镜像
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    # 容器名称，便于 docker ps / logs 查看
     container_name: Qwen3.5-35B-A3B
     ports:
+      # 宿主机 8788 端口映射到容器 8788 端口
       - "8788:8788"
     volumes:
+      # 挂载本地模型目录到容器内 /models
       - ./models:/models
     environment:
-      LLAMA_ARG_MODEL: /models/Qwen3.5-35B-A3B-GGUF/Q8_K_XL/Qwen3.5-35B-A3B-UD-Q8_K_XL.gguf
+      # 主模型 GGUF 文件路径
+      LLAMA_ARG_MODEL: /models/Qwen3.5-35B-A3B-GGUF/Q5_K_XL/Qwen3.5-35B-A3B-UD-Q5_K_XL.gguf
+      # 对外暴露给 API / WebUI 的模型别名
       LLAMA_ARG_ALIAS: qwen3.5-35b-a3b
+      # 多模态投影文件路径，用于图片理解
       LLAMA_ARG_MMPROJ: /models/Qwen3.5-35B-A3B-GGUF/mmproj-BF16.gguf
-      LLAMA_ARG_N_GPU_LAYERS: 99
-      LLAMA_ARG_N_PARALLEL: 4
+      # GPU 层卸载策略，auto 表示按显存自动决定放多少层到显卡
+      LLAMA_ARG_N_GPU_LAYERS: auto
+      # 是否启用 Flash Attention，通常可降低显存占用并提升速度
       LLAMA_ARG_FLASH_ATTN: 1
+      # 是否启用 Jinja 聊天模板解析
       LLAMA_ARG_JINJA: 1
-      # LLAMA_CHAT_TEMPLATE_KWARGS: '{"enable_thinking":false}' # 关闭思考动画
+      # 思考模式开关
+      LLAMA_CHAT_TEMPLATE_KWARGS: '{"enable_thinking":true}'
+      # 随机种子，固定后更利于结果复现
       LLAMA_ARG_SEED: 3407
+      # 采样温度，越高越发散，越低越稳定
       LLAMA_ARG_TEMP: 1.0
+      # nucleus sampling 参数，控制累计概率截断
       LLAMA_ARG_TOP_P: 0.95
+      # top-k sampling 参数，只在概率最高的前 K 个 token 中采样
       LLAMA_ARG_TOP_K: 20
+      # min-p sampling 参数，0.0 表示关闭
       LLAMA_ARG_MIN_P: 0.0
+      # 存在惩罚，鼓励模型少重复已经出现过的话题
       LLAMA_ARG_PRESENCE_PENALTY: 1.5
+      # 总上下文长度；单请求可用上下文还会受并发槽位数影响
       LLAMA_ARG_CTX_SIZE: 262144
+      # K 缓存量化类型，q8_0 更省显存但可能略影响质量
       LLAMA_ARG_CACHE_TYPE_K: q8_0
+      # V 缓存量化类型，q8_0 更省显存但可能略影响质量
       LLAMA_ARG_CACHE_TYPE_V: q8_0
+      # 监听地址，0.0.0.0 表示允许容器外访问
       LLAMA_ARG_HOST: 0.0.0.0
+      # 服务监听端口
       LLAMA_ARG_PORT: 8788
     deploy:
       resources:
         reservations:
           devices:
+            # 申请使用所有可用 NVIDIA GPU
             - driver: nvidia
               count: all
               capabilities: [gpu]
