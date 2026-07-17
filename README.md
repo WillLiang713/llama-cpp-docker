@@ -1,82 +1,73 @@
-# Qwen3-Coder-Next-GGUF Docker 部署
+# Qwythos-9B-Claude-Mythos-5-1M-GGUF Docker 部署
 
 ## 模型信息
 
-- **模型**: Qwen3-Coder-Next-GGUF Q4_K_M
-- **来源**: <https://modelscope.cn/models/unsloth/Qwen3-Coder-Next-GGUF>
-- **量化**: Q4_K_M（~48.4 GB）
+- 模型：`Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M.gguf`
+- 视觉投影：`mmproj-Qwythos-9B-Claude-Mythos-5-1M-F16.gguf`
+- 来源：<https://huggingface.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF>
+- 运行服务：`llama.cpp` CUDA server
 
-## 下载方式
+## 下载模型
 
-### 方式一：下载脚本（推荐）
-
-安装依赖：
+安装 Hugging Face 下载器和 Xet 高性能传输组件：
 
 ```bash
-pip install modelscope setuptools
+python -m pip install -r requirements.txt
 ```
 
-默认下载 unsloth 版 Q4_K_M：
+开始下载：
 
 ```bash
 python download_model.py
 ```
 
-自定义模型和量化类型：
+下载内容保存到：
+
+```text
+models/Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M/
+├── Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M.gguf
+└── mmproj-Qwythos-9B-Claude-Mythos-5-1M-F16.gguf
+```
+
+脚本调用 `hf_hub_download()`，默认 **Xet 高性能 + 32 并发 + 多文件并行**。
+
+**断点续传：** 上游 hub 会用随机 `.incomplete` 且失败即删。本脚本打补丁：固定 etag 临时文件、失败保留；有 partial 时用 HTTP Range 续传，否则走 Xet（并开启块缓存）。`Ctrl+C` 后重跑同一命令即可续。
 
 ```bash
-# 下载其他量化版本
-python download_model.py --quant Q8_0
+# 默认下载
+python download_model.py
 
-# 下载 Qwen 官方版
-python download_model.py --model Qwen/Qwen3-Coder-Next-GGUF --quant Q4_K_M
+# 串行 / 关高性能 / 调并发
+python download_model.py --no-parallel --no-high-performance --connections 16
 
-# 指定保存目录
-python download_model.py --local-dir ./models/my-model
-```
+# 国内镜像
+python download_model.py --endpoint https://hf-mirror.com
 
-下载完成后脚本会自动校验文件并打印 docker-compose 可用的模型路径。
+# HTTP 字节续传（更稳，通常更慢）
+python download_model.py --http-only
 
-### 方式二：ModelScope CLI
+# 只下某个文件
+python download_model.py --filename mmproj-Qwythos-9B-Claude-Mythos-5-1M-F16.gguf
 
-```bash
-pip install modelscope
-modelscope download --model unsloth/Qwen3-Coder-Next-GGUF --include "*Q4_K_M*" --local_dir ./models/Qwen3-Coder-Next-Q4_K_M
-```
-
-### 方式三：Git LFS
-
-```bash
-git lfs install
-git clone --depth 1 --filter=blob:none --sparse https://www.modelscope.cn/unsloth/Qwen3-Coder-Next-GGUF.git
-cd Qwen3-Coder-Next-GGUF
-git sparse-checkout set "Qwen3-Coder-Next-Q4_K_M.gguf"
-git lfs pull --include="Qwen3-Coder-Next-Q4_K_M.gguf/*"
-```
-
-## 注意事项
-
-下载完成后，根据脚本输出的路径更新 `docker-compose.yml` 中的 `LLAMA_ARG_MODEL`。
-
-不同来源的目录结构可能不同：
-
-```
-# unsloth 版
-models/Qwen3-Coder-Next-Q4_K_M/
-└── Qwen3-Coder-Next-Q4_K_M.gguf/
-    ├── Qwen3-Coder-Next-Q4_K_M-00001-of-000XX.gguf
-    └── ...
-
-# Qwen 官方版
-models/Qwen3-Coder-Next-Q4_K_M/
-├── Qwen3-Coder-Next-Q4_K_M-00001-of-000XX.gguf
-└── ...
+# Token（提高限额）
+set HF_TOKEN=hf_xxx
+python download_model.py
 ```
 
 ## 启动服务
 
+确认模型下载完成后运行：
+
 ```bash
-docker compose up
+docker compose up -d
 ```
 
-服务启动后访问 `http://localhost:8787` 即可使用。
+服务地址：<http://localhost:8787>
+
+查看运行日志：
+
+```bash
+docker compose logs -f
+```
+
+> 模型名称中的 `1M` 表示其支持的最大上下文能力，并不代表启动时必须直接分配 1M token。Compose 当前保留 `262144` 上下文设置，避免一开始占用过多显存；可按硬件情况调整 `LLAMA_ARG_CTX_SIZE`。

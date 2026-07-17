@@ -1,28 +1,32 @@
 services:
-  Qwen3-Coder-Next-Q4_K_M:
+  qwythos-9b-claude-mythos:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
-    container_name: Qwen3-Coder-Next-Q4_K_M
+    container_name: qwythos-9b-claude-mythos
     ports:
-      - "8787:8787"
+      - "8787:8000"
     volumes:
       - ./models:/models
     environment:
-      LLAMA_ARG_MODEL: /models/Qwen3-Coder-Next-Q4_K_M/Q4_K_M/Qwen3-Coder-Next-Q4_K_M-00001-of-00004.gguf
+      LLAMA_ARG_MODEL: /models/Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M/Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M.gguf
+      LLAMA_ARG_MMPROJ: /models/Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M/mmproj-Qwythos-9B-Claude-Mythos-5-1M-F16.gguf
       LLAMA_ARG_N_PARALLEL: 1
+      LLAMA_ARG_N_GPU_LAYERS: all
+      LLAMA_ARG_CONT_BATCHING: 1
+      LLAMA_ARG_BATCH: 4096
+      LLAMA_ARG_CACHE_PROMPT: 1
+      LLAMA_ARG_CACHE_IDLE_SLOTS: 1
+      LLAMA_ARG_KV_UNIFIED: 1
+      CACHE_RAM: 8192
       LLAMA_ARG_FLASH_ATTN: 1
-      LLAMA_ARG_JINJA: 1
-      LLAMA_ARG_SEED: 3407
-      LLAMA_ARG_TEMP: 1.0
-      LLAMA_ARG_TOP_P: 0.95
-      LLAMA_ARG_TOP_K: 40
-      LLAMA_ARG_MIN_P: 0.01
-      LLAMA_ARG_CTX_SIZE: 262144
+      LLAMA_ARG_CACHE_TYPE_K: q8_0
+      LLAMA_ARG_CACHE_TYPE_V: q8_0
+      LLAMA_ARG_FIT: on
       LLAMA_ARG_HOST: 0.0.0.0
-      LLAMA_ARG_PORT: 8787
+      LLAMA_ARG_PORT: 8000
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ["0", "1"]
+              device_ids: ["0"]
               capabilities: [gpu]
