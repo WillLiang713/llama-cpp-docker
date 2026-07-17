@@ -1,7 +1,7 @@
 services:
-  qwythos-9b-claude-mythos:
+  llama.cpp:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
-    container_name: qwythos-9b-claude-mythos
+    container_name: Qwythos-9B-Claude-Mythos-5-1M
     ports:
       - "8787:8000"
     volumes:
@@ -9,17 +9,23 @@ services:
     environment:
       LLAMA_ARG_MODEL: /models/Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M/Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M.gguf
       LLAMA_ARG_MMPROJ: /models/Qwythos-9B-Claude-Mythos-5-1M-Q4_K_M/mmproj-Qwythos-9B-Claude-Mythos-5-1M-F16.gguf
+      LLAMA_ARG_ALIAS: Qwythos-9B-Claude-Mythos-5-1M
       LLAMA_ARG_N_PARALLEL: 1
       LLAMA_ARG_N_GPU_LAYERS: all
       LLAMA_ARG_CONT_BATCHING: 1
       LLAMA_ARG_BATCH: 4096
+      LLAMA_ARG_TEMP: 0.6
+      LLAMA_ARG_TOP_P: 0.95
+      LLAMA_ARG_TOP_K: 20
+      LLAMA_ARG_REPEAT_PENALTY: 1.05
+      LLAMA_ARG_N_PREDICT: 16384
       LLAMA_ARG_CACHE_PROMPT: 1
       LLAMA_ARG_CACHE_IDLE_SLOTS: 1
       LLAMA_ARG_KV_UNIFIED: 1
       CACHE_RAM: 8192
       LLAMA_ARG_FLASH_ATTN: 1
       LLAMA_ARG_CACHE_TYPE_K: q8_0
-      LLAMA_ARG_CACHE_TYPE_V: q8_0
+      LLAMA_ARG_CACHE_TYPE_V: q4_0
       LLAMA_ARG_FIT: on
       LLAMA_ARG_HOST: 0.0.0.0
       LLAMA_ARG_PORT: 8000
